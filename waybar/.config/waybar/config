@@ -1,0 +1,67 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 32,
+    "spacing": 6,
+    "output": ["DP-1", "HDMI-A-1"],
+
+    "modules-left": ["hyprland/workspaces", "hyprland/window"],
+    "modules-center": ["clock"],
+    "modules-right": ["hyprland/language", "cpu", "memory", "pulseaudio", "network", "tray"],
+
+    "hyprland/workspaces": {
+        "format": "{id}",
+        "on-click": "activate"
+    },
+
+    "hyprland/window": {
+        "max-length": 50,
+        "separate-outputs": true
+    },
+
+    "clock": {
+        "format": "{:%H:%M  %d.%m.%Y}",
+        "tooltip-format": "<tt><small>{calendar}</small></tt>",
+        "calendar": {
+            "mode": "month",
+            "format": {
+                "today": "<span color='#89b4fa'><b>{}</b></span>"
+            }
+        },
+        "on-click": "gsimplecal",
+        "on-click-right": "kitty --hold -e timedatectl"
+    },
+
+    "hyprland/language": {
+        "format": "{short}"
+    },
+
+    "cpu": {
+        "format": "CPU {usage}%",
+        "interval": 2
+    },
+
+    "memory": {
+        "format": "RAM {used:0.1f}G",
+        "interval": 5
+    },
+
+    "pulseaudio": {
+        "format": "VOL {volume}%",
+        "format-muted": "VOL выкл",
+        "on-click": "pavucontrol",
+        "scroll-step": 5
+    },
+
+    "network": {
+    	"interval": 2,
+    	"format-ethernet": "LAN ↓{bandwidthDownBytes}",
+    	"format-wifi": "WiFi {signalStrength}% ({essid})",
+    	"format-disconnected": "Нет сети",
+    	"tooltip-format": "{ifname}: {ipaddr}",
+    },
+
+    "tray": {
+        "spacing": 8
+    }
+}

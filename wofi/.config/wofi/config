@@ -1,0 +1,10 @@
+mode=drun
+width=500
+height=400
+location=center
+prompt=Поиск
+allow_images=true
+image_size=32
+insensitive=true
+no_actions=true
+term=kitty
