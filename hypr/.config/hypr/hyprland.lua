@@ -38,6 +38,19 @@ hl.monitor({
     scale = 1,
 })
 
+-- Xiaomi (основной): столы 1-5
+hl.workspace_rule({ workspace = "1", monitor = "DP-1", default = true, persistent = true })
+hl.workspace_rule({ workspace = "2", monitor = "DP-1", persistent = true })
+hl.workspace_rule({ workspace = "3", monitor = "DP-1", persistent = true })
+hl.workspace_rule({ workspace = "4", monitor = "DP-1", persistent = true })
+hl.workspace_rule({ workspace = "5", monitor = "DP-1", persistent = true })
+
+-- DEXP (второй): столы 6-10
+hl.workspace_rule({ workspace = "6", monitor = "HDMI-A-1", default = true, persistent = true })
+hl.workspace_rule({ workspace = "7", monitor = "HDMI-A-1", persistent = true })
+hl.workspace_rule({ workspace = "8", monitor = "HDMI-A-1", persistent = true })
+hl.workspace_rule({ workspace = "9", monitor = "HDMI-A-1", persistent = true })
+hl.workspace_rule({ workspace = "10", monitor = "HDMI-A-1", persistent = true })
 
 ---------------------
 ---- MY PROGRAMS ----
@@ -52,6 +65,18 @@ local menu = "wofi"
 -------------------
 ---- AUTOSTART ----
 -------------------
+
+hl.on("hyprland.start", function()
+    hl.exec_cmd("hyprlock")
+    hl.exec_cmd("systemctl --user start hyprpolkitagent")
+    hl.exec_cmd("hyprpaper")
+    hl.exec_cmd("dunst")
+    hl.exec_cmd("waybar")
+    hl.exec_cmd("sh -c 'sleep 5 && wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.9 && wpctl set-volume @DEFAULT_AUDIO_SINK@ 1.0'")
+    hl.exec_cmd("nm-applet --indicator")
+    hl.exec_cmd("wl-paste --type text --watch cliphist store")
+    hl.exec_cmd("wl-paste --type image --watch cliphist store")
+end)
 
 -- See https://wiki.hypr.land/configuring/core/autostart/
 
@@ -293,16 +318,14 @@ hl.device({
 local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
 -- Example binds, see https://wiki.hypr.land/configuring/core/binds/ for more
-hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
-local closeWindowBind = hl.bind(mainMod .. " + C", hl.dsp.window.close())
--- closeWindowBind:set_enabled(false)
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))
+local closeWindowBind = hl.bind(mainMod .. " + C", hl.dsp.window.close()) -- closeWindowBind:set_enabled(false)
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
+hl.bind(mainMod .. " + F", hl.dsp.exec_cmd(fileManager))
+-- hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(menu))
-hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
+-- hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))    -- dwindle only
-hl.bind("SUPER + L", hl.dsp.exec_cmd("hyprlock"))
 
 -- Move focus with mainMod + arrow keys
 hl.bind(mainMod .. " + left",  hl.dsp.focus({ direction = "left" }))
@@ -319,8 +342,8 @@ for i = 1, 10 do
 end
 
 -- Example special workspace (scratchpad)
-hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
+-- hl.bind(mainMod .. " + S",         hl.dsp.workspace.toggle_special("magic"))
+-- hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:magic" }))
 
 -- Scroll through existing workspaces with mainMod + scroll
 hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }))
@@ -329,6 +352,23 @@ hl.bind(mainMod .. " + mouse_up",   hl.dsp.focus({ workspace = "e-1" }))
 -- Move/resize windows with mainMod + LMB/RMB and dragging
 hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(),   { mouse = true })
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+
+hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd("cliphist list | wofi --dmenu --prompt Буфер | cliphist decode | wl-copy"))
+hl.bind("SUPER + L", hl.dsp.exec_cmd("hyprlock"))
+hl.bind("SUPER + SHIFT + L", hl.dsp.exec_cmd("wlogout"))
+
+-- custom hotkeys
+hl.bind("SUPER + B", hl.dsp.exec_cmd("firefox"))
+hl.bind("SUPER + D", hl.dsp.exec_cmd("pkill wofi || wofi --show drun"))
+
+-- область экрана в файл
+hl.bind("SUPER + CTRL + S", hl.dsp.exec_cmd('f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png; grim -g "$(slurp)" "$f" && notify-send "Скриншот сохранён" "$f"'))
+
+-- область экрана в буфер обмена
+hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy && notify-send "Скриншот" "Область скопирована"'))
+
+-- все мониторы целиком в файл
+hl.bind("Print", hl.dsp.exec_cmd('f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png; grim "$f" && notify-send "Скриншот сохранён" "$f"'))
 
 -- Laptop multimedia keys for volume and LCD brightness
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
@@ -394,51 +434,12 @@ hl.window_rule({
     float = true,
 })
 
--- автозапуск
-hl.on("hyprland.start", function()
-    hl.exec_cmd("hyprlock")
-    hl.exec_cmd("systemctl --user start hyprpolkitagent")
-    hl.exec_cmd("hyprpaper")
-    hl.exec_cmd("dunst")
-    hl.exec_cmd("waybar")
-    hl.exec_cmd("nm-applet --indicator")
-end)
-
 -- переменная окружения для Firefox
 hl.env("MOZ_ENABLE_WAYLAND", "1")
-
--- горячие клавиши
-hl.bind("SUPER + B", hl.dsp.exec_cmd("firefox"))
-hl.bind("SUPER + D", hl.dsp.exec_cmd("pkill wofi || wofi --show drun"))
 
 hl.env("LIBVA_DRIVER_NAME", "nvidia")
 hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")
 hl.env("NVD_BACKEND", "direct")
-
--- область экрана в буфер обмена
-hl.bind("SUPER + SHIFT + S", hl.dsp.exec_cmd('grim -g "$(slurp)" - | wl-copy && notify-send "Скриншот" "Область скопирована"'))
-
--- область экрана в файл
-hl.bind("SUPER + CTRL + S", hl.dsp.exec_cmd('f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png; grim -g "$(slurp)" "$f" && notify-send "Скриншот сохранён" "$f"'))
-
--- все мониторы целиком в файл
-hl.bind("Print", hl.dsp.exec_cmd('f=~/Pictures/Screenshots/$(date +%F_%H-%M-%S).png; grim "$f" && notify-send "Скриншот сохранён" "$f"'))
-
-hl.bind("SUPER + SHIFT + E", hl.dsp.exec_cmd("wlogout"))
-
--- Xiaomi (основной): столы 1-5
-hl.workspace_rule({ workspace = "1", monitor = "DP-1", default = true, persistent = true })
-hl.workspace_rule({ workspace = "2", monitor = "DP-1", persistent = true })
-hl.workspace_rule({ workspace = "3", monitor = "DP-1", persistent = true })
-hl.workspace_rule({ workspace = "4", monitor = "DP-1", persistent = true })
-hl.workspace_rule({ workspace = "5", monitor = "DP-1", persistent = true })
-
--- DEXP (второй): столы 6-10
-hl.workspace_rule({ workspace = "6", monitor = "HDMI-A-1", default = true, persistent = true })
-hl.workspace_rule({ workspace = "7", monitor = "HDMI-A-1", persistent = true })
-hl.workspace_rule({ workspace = "8", monitor = "HDMI-A-1", persistent = true })
-hl.workspace_rule({ workspace = "9", monitor = "HDMI-A-1", persistent = true })
-hl.workspace_rule({ workspace = "10", monitor = "HDMI-A-1", persistent = true })
 
 hl.window_rule({ match = { class = "gsimplecal" }, float = true })
 hl.window_rule({ match = { class = "^(thunar)$" }, opacity = "0.85 0.85" })
